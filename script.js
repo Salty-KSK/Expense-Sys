@@ -767,7 +767,7 @@ JSONのみを返してください。説明文は不要です。`
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="text-align:center;">
-                        ${exp.status === '申請中' ? `<input type="checkbox" class="withdraw-chk" value="${exp.id}">` : ''}
+                        ${(exp.status === '申請中' || exp.status === '棄却') ? `<input type="checkbox" class="withdraw-chk" value="${exp.id}">` : ''}
                     </td>
                     <td>${formatDateJP(exp.date)}</td>
                     <td>${exp.category || '-'}</td>
