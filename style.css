@@ -1,22 +1,40 @@
-/* ============================================
-   経費申請システム - Brutalist Design System
-   注文書作成ツールのUIを完全踏襲
-   ============================================ */
+/* ============================================================
+   経費申請システム — Google Workspace / Material 3 Design System
+   勤怠管理・予算管理システムとの統一デザイン
+   ============================================================ */
 
 :root {
-    --primary-color: #000000;
-    --primary-hover: #333333;
-    --bg-color: #ffffff;
-    --text-color: #1a1a1a;
-    --text-muted: #888888;
-    --border-color: #e5e5e5;
-    --glass-bg: #ffffff;
-    --status-pending: #f59e0b;
-    --status-approved: #10b981;
-    --status-rejected: #ef4444;
-    --status-confirmed: #3b82f6;
+    /* Google Workspace Color Palette */
+    --google-bg: #F0F4F9;
+    --google-surface: #FFFFFF;
+    --google-primary: #0B57D0;
+    --google-primary-hover: #0842a0;
+    --google-active-pill: #D3E3FD;
+    --google-hover-pill: #E1E9F6;
+    --google-text-main: #1F1F1F;
+    --google-text-sub: #5E5E5E;
+    --google-border: #C7C7C7;
+    --google-border-light: #E3E3E3;
+    --google-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+    --google-transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+
+    /* Semantic / Status Colors */
+    --status-pending: #F4B400;
+    --status-pending-bg: #FEF7E0;
+    --status-approved: #0F9D58;
+    --status-approved-bg: #E6F4EA;
+    --status-rejected: #DB4437;
+    --status-rejected-bg: #FCE8E6;
+    --status-confirmed: #1A73E8;
+    --status-confirmed-bg: #E8F0FE;
+
+    /* Font */
+    --font-family: 'Noto Sans JP', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* ============================================================
+   Reset & Base
+   ============================================================ */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -24,14 +42,16 @@
 }
 
 body {
-    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: var(--text-color);
-    background-color: var(--bg-color);
+    font-family: var(--font-family);
+    color: var(--google-text-main);
+    background-color: var(--google-bg);
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 60px 20px;
-    letter-spacing: 0.05em;
+    padding: 40px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
 .app-container {
@@ -41,21 +61,27 @@ body {
 
 .form-container {
     width: 100%;
-    background-color: transparent;
-    border-radius: 0;
 }
 
-/* ===== Header ===== */
+/* ============================================================
+   Header
+   ============================================================ */
 .app-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
 }
 
 .app-header h1 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #000000;
-    letter-spacing: 0.1em;
+    color: var(--google-text-main);
+    letter-spacing: -0.01em;
+}
+
+.app-header h1 .material-symbols-outlined {
+    font-size: 28px;
+    color: var(--google-primary);
+    vertical-align: middle;
 }
 
 .login-header {
@@ -64,9 +90,8 @@ body {
 
 .login-subtitle {
     margin-top: 12px;
-    color: var(--text-muted);
+    color: var(--google-text-sub);
     font-size: 0.95rem;
-    letter-spacing: 0.1em;
 }
 
 .user-info {
@@ -76,52 +101,78 @@ body {
     gap: 16px;
     margin-top: 12px;
     font-size: 0.9rem;
-    color: var(--text-muted);
+    color: var(--google-text-sub);
 }
 
 .btn-logout {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    padding: 4px 14px;
-    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--google-surface);
+    border: 1px solid var(--google-border);
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
     font-family: inherit;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
+    letter-spacing: 0;
+    color: var(--google-primary);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--google-transition);
+    border-radius: 100px;
 }
 
 .btn-logout:hover {
-    border-color: #000;
-    color: #000;
+    background-color: var(--google-hover-pill);
+    border-color: var(--google-primary);
 }
 
-/* ===== Card / Glass ===== */
+.btn-logout:active {
+    transform: scale(0.97);
+}
+
+/* ============================================================
+   Card (Material 3 Container)
+   ============================================================ */
 .card.glass {
-    background: var(--glass-bg);
-    border: 1px solid #000000;
-    border-radius: 0px;
-    padding: 50px;
-    margin-bottom: 40px;
+    background: var(--google-surface);
+    border: 1px solid var(--google-border-light);
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px rgba(60,64,67,0.05);
+    transition: var(--google-transition);
 }
 
-/* ===== Headings ===== */
+.card.glass:hover {
+    box-shadow: 0 1px 3px rgba(60,64,67,0.1);
+}
+
+/* ============================================================
+   Section Headings (h2)
+   ============================================================ */
 h2 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 30px;
-    color: var(--text-color);
-    border-bottom: 1px solid #000000;
-    padding-bottom: 15px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--google-text-main);
+    border-bottom: 1px solid var(--google-border-light);
+    padding-bottom: 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    letter-spacing: 0.1em;
+    gap: 10px;
+    letter-spacing: -0.01em;
 }
 
-/* ===== Form Elements ===== */
+h2 .material-symbols-outlined {
+    font-size: 22px;
+    color: var(--google-primary);
+}
+
+/* ============================================================
+   Form Elements
+   ============================================================ */
 .form-group {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
 }
@@ -134,14 +185,15 @@ h2 {
 }
 
 label {
-    font-size: 0.9rem;
+    font-size: 14px;
     font-weight: 500;
-    margin-bottom: 8px;
-    color: var(--text-color);
+    margin-bottom: 6px;
+    color: var(--google-text-main);
+    padding-left: 4px;
 }
 
 .required {
-    color: #ef4444;
+    color: var(--status-rejected);
     margin-left: 4px;
 }
 
@@ -151,22 +203,27 @@ input[type="date"],
 select,
 textarea {
     width: 100%;
-    padding: 16px 16px;
-    border: 1px solid #000000;
-    border-radius: 0px;
-    font-size: 1rem;
+    padding: 12px 16px;
+    border: 1px solid var(--google-border);
+    border-radius: 12px;
+    font-size: 14px;
     font-family: inherit;
-    background-color: transparent;
-    transition: all 0.3s ease;
-    color: var(--text-color);
+    background-color: var(--google-surface);
+    transition: var(--google-transition);
+    color: var(--google-text-main);
 }
 
 input:focus,
 select:focus,
 textarea:focus {
     outline: none;
-    border-color: #000000;
-    box-shadow: 0 0 0 1px #000000;
+    border-color: var(--google-primary);
+    box-shadow: 0 0 0 2px rgba(11, 87, 208, 0.2);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #9E9E9E;
 }
 
 textarea {
@@ -179,7 +236,7 @@ select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E5E5E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 1.2rem;
@@ -194,67 +251,82 @@ input[type="date"] {
     width: 100%;
 }
 
-/* ===== Buttons ===== */
+/* ============================================================
+   Buttons (Capsule — Material 3 / Google Workspace style)
+   ============================================================ */
 .btn {
-    padding: 16px 24px;
-    border: 1px solid #000000;
-    border-radius: 0px;
-    font-size: 0.95rem;
+    padding: 12px 24px;
+    border: 1px solid var(--google-border);
+    border-radius: 100px;
+    font-size: 14px;
     font-weight: 500;
-    letter-spacing: 0.1em;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--google-transition);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: transparent;
-    color: #000000;
+    background-color: var(--google-surface);
+    color: var(--google-primary);
     font-family: inherit;
+    gap: 0.5rem;
 }
 
 .btn:hover {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--google-hover-pill);
+    border-color: var(--google-primary);
+}
+
+.btn:active {
+    transform: scale(0.98);
 }
 
 .btn:disabled {
-    background-color: transparent;
-    border-color: #cbd5e1;
-    color: #94a3b8;
+    opacity: 0.38;
     cursor: not-allowed;
 }
 
 .btn:disabled:hover {
-    background-color: transparent;
-    color: #94a3b8;
+    background-color: var(--google-surface);
+    border-color: var(--google-border);
 }
 
 .submit-btn {
     width: 100%;
-    background-color: #000000;
-    color: #ffffff;
-    font-size: 1.1rem;
-    font-weight: 400;
-    padding: 20px;
-    margin-top: 20px;
-    letter-spacing: 0.2em;
-    border-radius: 0px;
+    background-color: var(--google-primary);
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 24px;
+    margin-top: 16px;
+    border: none;
+    border-radius: 100px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .submit-btn:hover {
-    background-color: #ffffff;
-    color: #000000;
-    border: 1px solid #000000;
+    background-color: var(--google-primary-hover);
+    color: #FFFFFF;
+    border: none;
+    box-shadow: 0 1px 3px rgba(11, 87, 208, 0.3);
 }
 
-/* ===== Tabs ===== */
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
+/* ============================================================
+   Tabs (Material 3 Capsule Tabs)
+   ============================================================ */
 .tabs {
     display: flex;
     justify-content: center;
-    gap: 0;
-    margin: 0 auto 40px auto;
+    gap: 4px;
+    margin: 0 auto 32px auto;
     max-width: 800px;
-    border-bottom: 1px solid #000000;
+    background-color: var(--google-surface);
+    border: 1px solid var(--google-border-light);
+    border-radius: 100px;
+    padding: 4px;
     transition: max-width 0.3s ease;
 }
 
@@ -265,59 +337,67 @@ input[type="date"] {
 .tab-btn {
     background-color: transparent;
     border: none;
-    border-bottom: 3px solid transparent;
-    padding: 12px 30px;
-    font-size: 1rem;
+    padding: 10px 24px;
+    font-size: 14px;
     font-weight: 500;
-    letter-spacing: 0.1em;
-    color: #888888;
+    color: var(--google-text-sub);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--google-transition);
     font-family: inherit;
+    border-radius: 100px;
+    white-space: nowrap;
 }
 
 .tab-btn:hover {
-    color: #000000;
+    background-color: var(--google-hover-pill);
+    color: var(--google-text-main);
 }
 
 .tab-btn.active {
-    color: #000000;
-    border-bottom: 3px solid #000000;
+    background-color: var(--google-active-pill);
+    color: var(--google-primary);
+    font-weight: 600;
 }
 
-/* ===== Sub Filter Tabs ===== */
+/* ============================================================
+   Sub Filter Tabs (Pill filter buttons)
+   ============================================================ */
 .sub-filter-tabs {
     display: flex;
     gap: 8px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
 }
 
 .filter-btn {
-    background-color: transparent;
-    border: 1px solid #e5e5e5;
-    padding: 6px 14px;
-    font-size: 0.8rem;
+    background-color: var(--google-surface);
+    border: 1px solid var(--google-border-light);
+    padding: 6px 16px;
+    font-size: 13px;
     font-weight: 500;
-    letter-spacing: 0.05em;
-    color: #888888;
+    color: var(--google-text-sub);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--google-transition);
     font-family: inherit;
+    border-radius: 100px;
 }
 
 .filter-btn:hover {
-    border-color: #000000;
-    color: #000000;
+    background-color: var(--google-hover-pill);
+    border-color: var(--google-primary);
+    color: var(--google-primary);
 }
 
 .filter-btn.active {
-    background-color: #000000;
-    border-color: #000000;
-    color: #ffffff;
+    background-color: var(--google-active-pill);
+    border-color: transparent;
+    color: var(--google-primary);
+    font-weight: 600;
 }
 
-/* ===== History / Data Table ===== */
+/* ============================================================
+   Data Table (Google Workspace style)
+   ============================================================ */
 .history-table-wrapper {
     width: 100%;
     overflow-x: auto;
@@ -326,16 +406,15 @@ input[type="date"] {
 .history-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
+    font-size: 14px;
     text-align: left;
 }
 
 .history-table th,
 .history-table td {
-    padding: 16px 12px;
-    border-bottom: 1px solid #e5e5e5;
-    color: #000000;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--google-border-light);
+    color: var(--google-text-main);
 }
 
 .history-table td {
@@ -343,93 +422,105 @@ input[type="date"] {
 }
 
 .history-table th {
-    font-weight: 500;
-    color: #888888;
-    border-bottom: 1px solid #000000;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--google-text-sub);
+    background-color: #E9EEF6;
+    border-bottom: 1px solid var(--google-border-light);
     white-space: nowrap;
 }
 
 .history-table tbody tr {
-    transition: background-color 0.2s ease;
+    transition: var(--google-transition);
 }
 
 .history-table tbody tr:hover {
-    background-color: #f9f9f9;
+    background-color: var(--google-hover-pill);
 }
 
 .loading-text {
     text-align: center;
     padding: 40px;
-    color: #888888;
-    letter-spacing: 0.1em;
+    color: var(--google-text-sub);
 }
 
-/* ===== Status Badges ===== */
+/* ============================================================
+   Status Badges (Pill / Material 3 Tonal)
+   ============================================================ */
 .status-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 14px;
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.1em;
-    border: 1px solid;
+    border-radius: 100px;
+    border: none;
 }
 
 .status-pending {
-    color: var(--status-pending);
-    border-color: var(--status-pending);
-    background: #fffbeb;
+    color: #B06000;
+    background: var(--status-pending-bg);
 }
 
 .status-approved {
-    color: var(--status-approved);
-    border-color: var(--status-approved);
-    background: #ecfdf5;
+    color: #137333;
+    background: var(--status-approved-bg);
 }
 
 .status-rejected {
-    color: var(--status-rejected);
-    border-color: var(--status-rejected);
-    background: #fef2f2;
+    color: #C5221F;
+    background: var(--status-rejected-bg);
 }
 
 .status-confirmed {
-    color: var(--status-confirmed);
-    border-color: var(--status-confirmed);
-    background: #eff6ff;
+    color: #1A73E8;
+    background: var(--status-confirmed-bg);
 }
 
-/* ===== Camera Area ===== */
+/* ============================================================
+   Camera Area
+   ============================================================ */
 .camera-area {
-    border: 2px dashed #000000;
+    border: 2px dashed var(--google-border);
+    border-radius: 16px;
     min-height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--google-transition);
     position: relative;
     overflow: hidden;
+    background-color: #F8F9FA;
 }
 
 .camera-area:hover {
-    background-color: #f9f9f9;
+    border-color: var(--google-primary);
+    background-color: var(--google-hover-pill);
 }
 
 .camera-placeholder {
     text-align: center;
-    color: var(--text-muted);
+    color: var(--google-text-sub);
     padding: 40px;
 }
 
+.camera-placeholder .material-symbols-outlined {
+    font-size: 48px;
+    color: var(--google-border);
+    display: block;
+    margin: 0 auto 12px;
+}
+
 .camera-placeholder p {
-    margin-top: 12px;
+    margin-top: 8px;
     font-size: 0.95rem;
-    letter-spacing: 0.1em;
 }
 
 .camera-sub {
     font-size: 0.8rem !important;
-    color: #bbbbbb !important;
+    color: #9E9E9E !important;
     margin-top: 4px !important;
 }
 
@@ -437,6 +528,7 @@ input[type="date"] {
     max-width: 100%;
     max-height: 400px;
     object-fit: contain;
+    border-radius: 12px;
 }
 
 .camera-actions {
@@ -449,18 +541,20 @@ input[type="date"] {
     flex: 1;
 }
 
-/* ===== OCR Loading ===== */
+/* ============================================================
+   OCR Loading
+   ============================================================ */
 .ocr-loading {
     text-align: center;
     padding: 30px;
-    color: var(--text-muted);
+    color: var(--google-text-sub);
 }
 
 .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #e5e5e5;
-    border-top: 3px solid #000000;
+    border: 3px solid var(--google-border-light);
+    border-top: 3px solid var(--google-primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     margin: 0 auto 16px;
@@ -471,7 +565,9 @@ input[type="date"] {
     100% { transform: rotate(360deg); }
 }
 
-/* ===== Invoice Input ===== */
+/* ============================================================
+   Invoice Input
+   ============================================================ */
 .invoice-input-wrapper {
     display: flex;
     gap: 8px;
@@ -482,30 +578,33 @@ input[type="date"] {
 }
 
 .btn-invoice-search {
-    padding: 16px 20px;
-    border: 1px solid #000;
-    background: transparent;
+    padding: 12px 20px;
+    border: 1px solid var(--google-border);
+    background: var(--google-surface);
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 13px;
     font-weight: 500;
-    letter-spacing: 0.1em;
+    color: var(--google-primary);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--google-transition);
     white-space: nowrap;
+    border-radius: 100px;
 }
 
 .btn-invoice-search:hover {
-    background: #000;
-    color: #fff;
+    background: var(--google-hover-pill);
+    border-color: var(--google-primary);
 }
 
 .invoice-hint {
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--google-text-sub);
     margin-top: 6px;
 }
 
-/* ===== Login ===== */
+/* ============================================================
+   Login
+   ============================================================ */
 .login-form-wrapper {
     max-width: 500px;
     margin: 0 auto;
@@ -515,19 +614,22 @@ input[type="date"] {
     text-align: left;
 }
 
-/* ===== Modal ===== */
+/* ============================================================
+   Modal (Material 3)
+   ============================================================ */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.32);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
     padding: 20px;
+    backdrop-filter: blur(2px);
 }
 
 .modal-content {
@@ -535,7 +637,7 @@ input[type="date"] {
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    animation: modalIn 0.2s ease;
+    animation: modalIn 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .modal-wide {
@@ -545,7 +647,7 @@ input[type="date"] {
 @keyframes modalIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(6px);
     }
     to {
         opacity: 1;
@@ -563,12 +665,14 @@ input[type="date"] {
     flex: 1;
 }
 
-/* ===== Detail Modal Content ===== */
+/* ============================================================
+   Detail Modal Content
+   ============================================================ */
 .detail-row {
     display: flex;
     justify-content: space-between;
     padding: 12px 0;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--google-border-light);
     font-size: 0.9rem;
 }
 
@@ -577,8 +681,8 @@ input[type="date"] {
 }
 
 .detail-label {
-    color: var(--text-muted);
-    font-weight: 400;
+    color: var(--google-text-sub);
+    font-weight: 500;
 }
 
 .detail-value {
@@ -593,54 +697,60 @@ input[type="date"] {
     max-height: 300px;
     object-fit: contain;
     margin-top: 16px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--google-border-light);
+    border-radius: 12px;
 }
 
-/* ===== Action Buttons in Table ===== */
+/* ============================================================
+   Action Buttons in Table (Material 3 Tonal)
+   ============================================================ */
 .action-btn {
-    display: inline-block;
-    padding: 6px 12px;
-    border: 1px solid #000000;
-    color: #000000;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 100px;
+    color: var(--google-primary);
+    background: var(--google-hover-pill);
     text-decoration: none;
-    font-weight: 600;
-    font-size: 0.75rem;
-    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 12px;
+    transition: var(--google-transition);
     white-space: nowrap;
     cursor: pointer;
-    background: transparent;
     font-family: inherit;
-    letter-spacing: 0.05em;
 }
 
 .action-btn:hover {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--google-active-pill);
+}
+
+.action-btn:active {
+    transform: scale(0.95);
 }
 
 .action-btn.approve {
-    border-color: var(--status-approved);
-    color: var(--status-approved);
+    color: #137333;
+    background: var(--status-approved-bg);
 }
 
 .action-btn.approve:hover {
-    background-color: var(--status-approved);
-    color: #fff;
-    border-color: var(--status-approved);
+    background-color: #ceead6;
 }
 
 .action-btn.reject {
-    border-color: var(--status-rejected);
-    color: var(--status-rejected);
+    color: #C5221F;
+    background: var(--status-rejected-bg);
 }
 
 .action-btn.reject:hover {
-    background-color: var(--status-rejected);
-    color: #fff;
-    border-color: var(--status-rejected);
+    background-color: #f5cfcc;
 }
 
-/* ===== Toast Notifications ===== */
+/* ============================================================
+   Toast Notifications (Material 3 Snackbar)
+   ============================================================ */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -652,28 +762,26 @@ input[type="date"] {
 }
 
 .toast {
-    padding: 16px 24px;
-    border: 1px solid #000;
-    background: #fff;
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
+    padding: 14px 24px;
+    border: 1px solid var(--google-border-light);
+    background: var(--google-surface);
+    font-size: 14px;
     font-family: inherit;
     animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
     max-width: 360px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(60,64,67,0.15);
 }
 
 .toast.success {
-    border-color: var(--status-approved);
     border-left: 4px solid var(--status-approved);
 }
 
 .toast.error {
-    border-color: var(--status-rejected);
     border-left: 4px solid var(--status-rejected);
 }
 
 .toast.info {
-    border-color: var(--status-confirmed);
     border-left: 4px solid var(--status-confirmed);
 }
 
@@ -699,10 +807,55 @@ input[type="date"] {
     }
 }
 
-/* ===== Responsive ===== */
+/* ============================================================
+   Approval Group Sections
+   ============================================================ */
+.approval-group.card.glass {
+    padding: 24px 28px;
+}
+
+.approval-group h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--google-text-main);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--google-border-light) !important;
+}
+
+/* ============================================================
+   Withdraw Actions Bar
+   ============================================================ */
+#withdraw-actions {
+    background: var(--status-rejected-bg) !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    border: 1px solid rgba(219, 68, 55, 0.15);
+}
+
+#withdraw-actions .btn {
+    color: #C5221F;
+    border-color: rgba(219, 68, 55, 0.3);
+}
+
+#withdraw-actions .btn:hover {
+    background-color: #f5cfcc;
+}
+
+/* ============================================================
+   Material Symbols
+   ============================================================ */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
 @media (max-width: 768px) {
     body {
-        padding: 20px 10px;
+        padding: 16px 10px;
     }
 
     input[type="text"],
@@ -720,7 +873,8 @@ input[type="date"] {
 
     .card.glass {
         padding: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
+        border-radius: 20px;
     }
 
     .sub-filter-tabs {
@@ -730,13 +884,19 @@ input[type="date"] {
 
     .filter-btn {
         flex: 0 0 auto;
-        padding: 6px 10px;
-        font-size: 0.75rem;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .tabs {
+        border-radius: 16px;
+        gap: 2px;
+        padding: 3px;
     }
 
     .tab-btn {
-        padding: 10px 16px;
-        font-size: 0.85rem;
+        padding: 8px 14px;
+        font-size: 13px;
     }
 
     .camera-actions {
@@ -749,12 +909,13 @@ input[type="date"] {
 
     .modal-content {
         padding: 20px !important;
+        border-radius: 20px !important;
     }
 
     .history-table th,
     .history-table td {
-        padding: 12px 8px;
-        font-size: 0.78rem;
+        padding: 12px 10px;
+        font-size: 13px;
     }
 
     .toast {
@@ -764,10 +925,17 @@ input[type="date"] {
 
 @media (max-width: 480px) {
     .app-header h1 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
 
     .tabs {
         flex-wrap: wrap;
+        border-radius: 16px;
+    }
+
+    .tab-btn {
+        flex: 1;
+        text-align: center;
+        min-width: 0;
     }
 }

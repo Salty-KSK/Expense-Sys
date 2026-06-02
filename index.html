@@ -9,7 +9,7 @@
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#F0F4F9">
     <link rel="apple-touch-icon" href="icon.png">
     <script>
         if ('serviceWorker' in navigator) {
@@ -19,8 +19,8 @@
         }
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -35,12 +35,7 @@
         <div id="login-view" class="view">
             <header class="app-header login-header">
                 <h1 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                        stroke="#000000" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
+                    <span class="material-symbols-outlined" style="font-size:28px; color:#0B57D0;">receipt_long</span>
                     経費申請システム
                 </h1>
                 <p class="login-subtitle">ログインして経費申請を開始</p>
@@ -49,11 +44,7 @@
             <div class="login-form-wrapper">
                 <section class="card glass login-card">
                     <h2>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+                        <span class="material-symbols-outlined">person</span>
                         従業員ログイン
                     </h2>
 
@@ -79,10 +70,10 @@
                         </div>
 
                         <!-- ローカルファイル起動時用のフォールバック -->
-                        <div id="local-login-fallback" style="display:none; text-align:center; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ccc;">
-                            <p style="color:#d9534f; font-size: 0.9rem; margin-bottom: 10px;">ローカル環境（Googleログイン不可）のため<br>テストログインを使用します</p>
-                            <select id="local-login-user" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 80%; max-width: 300px;">
-                                <option value="">（読み込み中...）</option>
+                        <div id="local-login-fallback" style="display:none; text-align:center; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--google-border-light);">
+                            <p style="color:#C5221F; font-size: 0.9rem; margin-bottom: 10px;">ローカル環境（Googleログイン不可）のため<br>テストログインを使用します</p>
+                            <select id="local-login-user" style="padding: 12px 16px; border-radius: 12px; border: 1px solid var(--google-border); width: 80%; max-width: 300px; font-family: inherit;">
+                                <option value="">(読み込み中...)</option>
                             </select>
                             <br>
                             <button type="button" class="btn submit-btn" id="btn-local-login" style="margin-top: 15px; width: 80%; max-width: 300px;">テストログイン</button>
@@ -98,12 +89,7 @@
         <div id="main-view" class="view" style="display: none;">
             <header class="app-header">
                 <h1 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                        stroke="#000000" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
+                    <span class="material-symbols-outlined" style="font-size:28px; color:#0B57D0;">receipt_long</span>
                     経費申請システム
                 </h1>
                 <div class="user-info">
@@ -130,27 +116,13 @@
                         <!-- レシート撮影セクション -->
                         <section class="card glass">
                             <h2>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
-                                    stroke-linejoin="miter">
-                                    <path
-                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
-                                    </path>
-                                    <circle cx="12" cy="13" r="4"></circle>
-                                </svg>
+                                <span class="material-symbols-outlined">photo_camera</span>
                                 レシート撮影
                             </h2>
 
                             <div class="camera-area" id="camera-area">
                                 <div class="camera-placeholder" id="camera-placeholder">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
-                                        fill="none" stroke="#888888" stroke-width="1" stroke-linecap="square"
-                                        stroke-linejoin="miter">
-                                        <path
-                                            d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
-                                        </path>
-                                        <circle cx="12" cy="13" r="4"></circle>
-                                    </svg>
+                                    <span class="material-symbols-outlined">photo_camera</span>
                                     <p>タップしてレシートを撮影</p>
                                     <p class="camera-sub">またはギャラリーから選択</p>
                                 </div>
@@ -161,8 +133,8 @@
 
                             <div class="camera-actions" id="camera-actions" style="display:none;">
                                 <button type="button" class="btn" id="btn-retake">撮り直す</button>
-                                <button type="button" class="btn" id="btn-ocr"
-                                    style="background:#000;color:#fff;">内容を読み取る</button>
+                                <button type="button" class="btn submit-btn" id="btn-ocr"
+                                    style="margin-top:0;">内容を読み取る</button>
                             </div>
 
                             <div class="ocr-loading" id="ocr-loading" style="display:none;">
@@ -174,14 +146,7 @@
                         <!-- 経費入力フォーム -->
                         <section class="card glass" id="expense-form-section">
                             <h2>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
-                                    stroke-linejoin="miter">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                </svg>
+                                <span class="material-symbols-outlined">description</span>
                                 経費内容
                             </h2>
 
@@ -250,7 +215,7 @@
                         <!-- 送信待ちリスト -->
                         <section class="card glass" id="draft-list-section" style="display:none; margin-top: 20px;">
                             <h2>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                <span class="material-symbols-outlined">pending_actions</span>
                                 送信待ちリスト (<span id="draft-count">0</span>件)
                             </h2>
                             <div class="history-table-wrapper" style="display:block;">
@@ -274,7 +239,7 @@
                             
                             <div class="form-group" style="margin-top: 15px;">
                                 <label for="submission-target">提出先（課長） <span class="required">*</span></label>
-                                <select id="submission-target" style="padding:10px; border-radius:8px; border:1px solid #ccc; width:100%;">
+                                <select id="submission-target" style="padding:12px 16px; border-radius:12px; border:1px solid var(--google-border); width:100%; font-family:inherit;">
                                     <option value="">選択してください</option>
                                 </select>
                             </div>
@@ -291,19 +256,13 @@
                     <div style="max-width: 1200px; margin: 0 auto;">
                         <section class="card glass">
                             <h2>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
-                                    stroke-linejoin="miter">
-                                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                    <polyline points="2 17 12 22 22 17"></polyline>
-                                    <polyline points="2 12 12 17 22 12"></polyline>
-                                </svg>
+                                <span class="material-symbols-outlined">list_alt</span>
                                 申請済み経費一覧
                             </h2>
 
                             <!-- 月フィルター -->
                             <div class="form-group" style="margin-bottom: 20px;">
-                                <select id="month-dropdown" style="max-width:200px; padding: 10px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-size: 1rem; background:rgba(255,255,255,0.7); backdrop-filter:blur(4px);">
+                                <select id="month-dropdown" style="max-width:200px; padding: 12px 16px; border: 1px solid var(--google-border); border-radius: 12px; font-size: 14px; background: var(--google-surface); font-family: inherit;">
                                     <option value="ALL">すべての月</option>
                                     <option value="1">1月</option>
                                     <option value="2">2月</option>
@@ -322,8 +281,8 @@
 
                             <div id="list-loading" class="loading-text">データを取得しています...</div>
 
-                            <div id="withdraw-actions" style="margin-bottom:15px; display:none; background: rgba(255,230,230,0.5); padding: 10px; border-radius: 8px;">
-                                <button class="btn reject" id="btn-bulk-withdraw" style="padding: 8px 15px; font-size: 0.95rem;">選択した経費を一括取り下げ（修正用リストへ戻す）</button>
+                            <div id="withdraw-actions" style="margin-bottom:15px; display:none;">
+                                <button class="btn" id="btn-bulk-withdraw" style="padding: 10px 20px; font-size: 13px;">選択した経費を一括取り下げ（修正用リストへ戻す）</button>
                             </div>
 
                             <div class="history-table-wrapper" id="expense-table-wrapper" style="display:none;">
@@ -358,12 +317,7 @@
                     <div style="max-width: 1200px; margin: 0 auto;">
                         <section class="card glass">
                             <h2>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
-                                    stroke-linejoin="miter">
-                                    <polyline points="9 11 12 14 22 4"></polyline>
-                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                                </svg>
+                                <span class="material-symbols-outlined">task_alt</span>
                                 <span id="approve-title">承認待ち経費</span>
                             </h2>
 
@@ -383,12 +337,7 @@
                     <div style="max-width: 1200px; margin: 0 auto;">
                         <section class="card glass">
                             <h2>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
-                                    stroke-linejoin="miter">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                </svg>
+                                <span class="material-symbols-outlined">verified</span>
                                 承認済み経費
                             </h2>
 
@@ -421,12 +370,7 @@
         <div class="modal-overlay" id="reject-modal" style="display:none;">
             <div class="modal-content card glass">
                 <h2>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="15" y1="9" x2="9" y2="15"></line>
-                        <line x1="9" y1="9" x2="15" y2="15"></line>
-                    </svg>
+                    <span class="material-symbols-outlined">cancel</span>
                     棄却理由
                 </h2>
                 <div class="form-group">
@@ -445,11 +389,7 @@
         <div class="modal-overlay" id="detail-modal" style="display:none;">
             <div class="modal-content card glass modal-wide">
                 <h2>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                    </svg>
+                    <span class="material-symbols-outlined">info</span>
                     経費詳細
                 </h2>
                 <div id="detail-body"></div>
