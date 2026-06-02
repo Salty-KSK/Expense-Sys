@@ -733,40 +733,21 @@ JSONのみを返してください。説明文は不要です。`
     }
 
     // ============================================
-    // 経費一覧表示
+    // 経費一覧表示（キャッシュ＆重複防止つき）
     // ============================================
     let currentMonthFilter = 'ALL';
+    let isLoadingExpenseList = false; // 重複呼び出し防止ガード
+    const EXPENSE_CACHE_KEY = 'cachedExpenseList';
 
     monthDropdown.addEventListener('change', (e) => {
         currentMonthFilter = e.target.value;
         loadExpenseList();
     });
 
-    async function loadExpenseList() {
-        listLoading.style.display = 'block';
-        expenseTableWrapper.style.display = 'none';
+    function renderExpenseRows(expenses) {
         expenseTbody.innerHTML = '';
 
-        let expenses = [];
-
-        if (GAS_WEBAPP_URL.includes('YOUR_GAS')) {
-            // デモモード
-            expenses = JSON.parse(localStorage.getItem('demoExpenses') || '[]')
-                .filter(exp => exp.employeeName === currentUser.name);
-        } else {
-            try {
-                // キャッシュを回避するためにタイムスタンプを付与
-                const res = await fetch(`${GAS_WEBAPP_URL}?mode=get_expenses&employee=${encodeURIComponent(currentUser.name)}&month=${currentMonthFilter}&t=${Date.now()}`);
-                const data = await res.json();
-                expenses = data.expenses || [];
-            } catch (e) {
-                console.error('Load expense list error:', e);
-                showToast('経費一覧の取得に失敗しました', 'error');
-            }
-        }
-        window.currentExpenses = expenses;
-
-        // フィルタ適用（削除済の履歴のみ一覧の行から隠し、取り下げ・棄却は表示する）
+        // フィルタ適用
         expenses = expenses.filter(exp => exp.status !== '削除');
 
         if (currentMonthFilter !== 'ALL') {
@@ -801,12 +782,72 @@ JSONのみを返してください。説明文は不要です。`
             });
             if (expenseTotalAmountSpan) expenseTotalAmountSpan.textContent = formatCurrency(total);
         } else {
-            expenseTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#888;">経費データがありません</td></tr>';
+            expenseTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--google-text-sub);">経費データがありません</td></tr>';
+            if (expenseTotalAmountSpan) expenseTotalAmountSpan.textContent = '¥ 0';
         }
 
         listLoading.style.display = 'none';
         expenseTableWrapper.style.display = 'block';
         updateWithdrawActions();
+    }
+
+    async function loadExpenseList() {
+        // 重複呼び出し防止
+        if (isLoadingExpenseList) return;
+        isLoadingExpenseList = true;
+
+        listLoading.style.display = 'block';
+        expenseTableWrapper.style.display = 'none';
+        expenseTbody.innerHTML = '';
+
+        let expenses = [];
+
+        if (GAS_WEBAPP_URL.includes('YOUR_GAS')) {
+            expenses = JSON.parse(localStorage.getItem('demoExpenses') || '[]')
+                .filter(exp => exp.employeeName === currentUser.name);
+            window.currentExpenses = expenses;
+            renderExpenseRows(expenses);
+            isLoadingExpenseList = false;
+            return;
+        }
+
+        // キャッシュがあれば即座に表示
+        try {
+            const cached = localStorage.getItem(EXPENSE_CACHE_KEY);
+            if (cached) {
+                const cachedData = JSON.parse(cached);
+                if (cachedData && cachedData.length > 0) {
+                    window.currentExpenses = cachedData;
+                    renderExpenseRows(cachedData);
+                }
+            }
+        } catch (e) { /* ignore */ }
+
+        // GASから最新データを取得
+        try {
+            const res = await fetch(`${GAS_WEBAPP_URL}?mode=get_expenses&employee=${encodeURIComponent(currentUser.name)}&month=${currentMonthFilter}&t=${Date.now()}`);
+            const data = await res.json();
+            expenses = data.expenses || [];
+            window.currentExpenses = expenses;
+
+            // キャッシュ更新
+            try {
+                localStorage.setItem(EXPENSE_CACHE_KEY, JSON.stringify(expenses));
+            } catch (e) { /* ignore */ }
+
+            // 最新データで再描画
+            renderExpenseRows(expenses);
+        } catch (e) {
+            console.error('Load expense list error:', e);
+            showToast('経費一覧の取得に失敗しました', 'error');
+            // キャッシュで既に表示済みならエラーでも表示を維持
+            if (!expenseTbody.hasChildNodes()) {
+                listLoading.style.display = 'none';
+                expenseTableWrapper.style.display = 'block';
+            }
+        } finally {
+            isLoadingExpenseList = false;
+        }
     }
 
     // ============================================
