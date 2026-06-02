@@ -1,0 +1,17 @@
+{
+    "name": "経費申請システム",
+    "short_name": "経費申請",
+    "description": "レシート撮影で自動入力、承認フロー付き経費申請システム",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "lang": "ja",
+    "icons": [
+        {
+            "src": "icon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>経費申請システム</title>
+    <meta name="description" content="レシート撮影で自動入力、承認フロー付き経費申請システム">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="icon.png">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js');
+            });
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- ========================================= -->
+        <!-- ログイン画面                                -->
+        <!-- ========================================= -->
+        <div id="login-view" class="view">
+            <header class="app-header login-header">
+                <h1 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                        stroke="#000000" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    経費申請システム
+                </h1>
+                <p class="login-subtitle">ログインして経費申請を開始</p>
+            </header>
+
+            <div class="login-form-wrapper">
+                <section class="card glass login-card">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        従業員ログイン
+                    </h2>
+
+                    <div style="text-align: center; margin: 20px 0;">
+                        <!-- Googleログインのボタンコンテナ -->
+                        <div id="g_id_onload"
+                             data-client_id="194795637545-vlhe2674jvf9crbc2b15c2o85u8aq0qn.apps.googleusercontent.com"
+                             data-context="signin"
+                             data-ux_mode="popup"
+                             data-callback="handleGoogleLogin"
+                             data-auto_prompt="false"
+                             data-itp_support="true">
+                        </div>
+                        
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-shape="rectangular"
+                             data-theme="outline"
+                             data-text="signin_with"
+                             data-size="large"
+                             data-logo_alignment="left"
+                             style="display: flex; justify-content: center; margin-top: 10px;">
+                        </div>
+
+                        <!-- ローカルファイル起動時用のフォールバック -->
+                        <div id="local-login-fallback" style="display:none; text-align:center; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ccc;">
+                            <p style="color:#d9534f; font-size: 0.9rem; margin-bottom: 10px;">ローカル環境（Googleログイン不可）のため<br>テストログインを使用します</p>
+                            <select id="local-login-user" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 80%; max-width: 300px;">
+                                <option value="">（読み込み中...）</option>
+                            </select>
+                            <br>
+                            <button type="button" class="btn submit-btn" id="btn-local-login" style="margin-top: 15px; width: 80%; max-width: 300px;">テストログイン</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- メイン画面（ログイン後）                       -->
+        <!-- ========================================= -->
+        <div id="main-view" class="view" style="display: none;">
+            <header class="app-header">
+                <h1 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                        stroke="#000000" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    経費申請システム
+                </h1>
+                <div class="user-info">
+                    <span id="current-user-name">-</span>
+                    <button type="button" class="btn-logout" id="btn-logout">ログアウト</button>
+                </div>
+            </header>
+
+            <!-- タブナビゲーション -->
+            <div class="tabs" id="main-tabs">
+                <button class="tab-btn active" data-tab="tab-new">新規申請</button>
+                <button class="tab-btn" data-tab="tab-list">申請一覧</button>
+                <button class="tab-btn tab-approval" data-tab="tab-approve" style="display:none;">承認待ち</button>
+                <button class="tab-btn tab-completed" data-tab="tab-completed" style="display:none;">承認済み</button>
+            </div>
+
+            <!-- ============================== -->
+            <!--  タブ1: 新規経費申請               -->
+            <!-- ============================== -->
+            <main class="form-container">
+                <div id="tab-new" class="tab-content">
+                    <div style="max-width: 800px; margin: 0 auto;">
+
+                        <!-- レシート撮影セクション -->
+                        <section class="card glass">
+                            <h2>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
+                                    stroke-linejoin="miter">
+                                    <path
+                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                    </path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
+                                レシート撮影
+                            </h2>
+
+                            <div class="camera-area" id="camera-area">
+                                <div class="camera-placeholder" id="camera-placeholder">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                                        fill="none" stroke="#888888" stroke-width="1" stroke-linecap="square"
+                                        stroke-linejoin="miter">
+                                        <path
+                                            d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                        </path>
+                                        <circle cx="12" cy="13" r="4"></circle>
+                                    </svg>
+                                    <p>タップしてレシートを撮影</p>
+                                    <p class="camera-sub">またはギャラリーから選択</p>
+                                </div>
+                                <input type="file" id="receipt-input" accept="image/*" capture="environment"
+                                    style="display:none;">
+                                <img id="receipt-preview" class="receipt-preview" style="display:none;" alt="レシートプレビュー">
+                            </div>
+
+                            <div class="camera-actions" id="camera-actions" style="display:none;">
+                                <button type="button" class="btn" id="btn-retake">撮り直す</button>
+                                <button type="button" class="btn" id="btn-ocr"
+                                    style="background:#000;color:#fff;">内容を読み取る</button>
+                            </div>
+
+                            <div class="ocr-loading" id="ocr-loading" style="display:none;">
+                                <div class="spinner"></div>
+                                <p>レシートを解析中...</p>
+                            </div>
+                        </section>
+
+                        <!-- 経費入力フォーム -->
+                        <section class="card glass" id="expense-form-section">
+                            <h2>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
+                                    stroke-linejoin="miter">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                </svg>
+                                経費内容
+                            </h2>
+
+                            <form id="expense-form">
+                                <div class="form-group">
+                                    <label for="expense-date">利用日 <span class="required">*</span></label>
+                                    <input type="date" id="expense-date" name="expense-date" required>
+                                </div>
+
+                                <div class="form-group" style="position:relative;">
+                                    <label for="expense-category">経費科目 <span class="required">*</span></label>
+                                    <select id="expense-category" name="expense-category" required>
+                                        <option value="">選択してください</option>
+                                        <option value="交通費">交通費</option>
+                                        <option value="宿泊費">宿泊費</option>
+                                        <option value="会議費">会議費</option>
+                                        <option value="交際費">交際費</option>
+                                        <option value="消耗品費">消耗品費</option>
+                                        <option value="通信費">通信費</option>
+                                        <option value="図書費">図書費</option>
+                                        <option value="雑費">雑費</option>
+                                        <option value="飲食費">飲食費</option>
+                                        <option value="備品費">備品費</option>
+                                        <option value="その他">その他</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" style="position:relative;">
+                                    <label for="expense-payment-method">支払種別 <span class="required">*</span></label>
+                                    <select id="expense-payment-method" name="expense-payment-method" required>
+                                        <option value="">選択してください</option>
+                                        <option value="現金">現金</option>
+                                        <option value="クレジットカード（会社）">クレジットカード（会社）</option>
+                                        <option value="クレジットカード（個人）">クレジットカード（個人）</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="expense-amount">金額（税込・円） <span class="required">*</span></label>
+                                    <input type="text" id="expense-amount" name="expense-amount"
+                                        placeholder="例: 1,500" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="expense-store">店名・会社名 <span class="required">*</span></label>
+                                    <input type="text" id="expense-store" name="expense-store"
+                                        placeholder="例: スターバックス渋谷店" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="expense-invoice">インボイス登録番号</label>
+                                    <input type="text" id="expense-invoice" name="expense-invoice"
+                                        placeholder="T0000000000000">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="expense-memo">備考</label>
+                                    <textarea id="expense-memo" name="expense-memo" rows="3"
+                                        placeholder="補足があれば入力"></textarea>
+                                </div>
+
+                                <button type="submit" class="btn submit-btn" id="btn-add-draft">リストに追加する</button>
+                            </form>
+                        </section>
+
+                        <!-- 送信待ちリスト -->
+                        <section class="card glass" id="draft-list-section" style="display:none; margin-top: 20px;">
+                            <h2>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                送信待ちリスト (<span id="draft-count">0</span>件)
+                            </h2>
+                            <div class="history-table-wrapper" style="display:block;">
+                                <table class="history-table" style="min-width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>利用日</th>
+                                            <th>経費科目</th>
+                                            <th style="text-align:right;">金額</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="draft-tbody">
+                                        <!-- Javascriptで追加 -->
+                                    </tbody>
+                                </table>
+                                <div style="text-align: right; margin-top: 10px; font-weight: bold; padding-right: 10px;">
+                                    精算対象合計金額: <span id="draft-total-amount">¥ 0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label for="submission-target">提出先（課長） <span class="required">*</span></label>
+                                <select id="submission-target" style="padding:10px; border-radius:8px; border:1px solid #ccc; width:100%;">
+                                    <option value="">選択してください</option>
+                                </select>
+                            </div>
+
+                            <button type="button" class="btn submit-btn" id="btn-submit-all" style="margin-top: 15px;">まとめて申請する</button>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- ============================== -->
+                <!--  タブ2: 申請一覧                  -->
+                <!-- ============================== -->
+                <div id="tab-list" class="tab-content" style="display:none;">
+                    <div style="max-width: 1200px; margin: 0 auto;">
+                        <section class="card glass">
+                            <h2>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
+                                    stroke-linejoin="miter">
+                                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                    <polyline points="2 17 12 22 22 17"></polyline>
+                                    <polyline points="2 12 12 17 22 12"></polyline>
+                                </svg>
+                                申請済み経費一覧
+                            </h2>
+
+                            <!-- 月フィルター -->
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <select id="month-dropdown" style="max-width:200px; padding: 10px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-size: 1rem; background:rgba(255,255,255,0.7); backdrop-filter:blur(4px);">
+                                    <option value="ALL">すべての月</option>
+                                    <option value="1">1月</option>
+                                    <option value="2">2月</option>
+                                    <option value="3">3月</option>
+                                    <option value="4">4月</option>
+                                    <option value="5">5月</option>
+                                    <option value="6">6月</option>
+                                    <option value="7">7月</option>
+                                    <option value="8">8月</option>
+                                    <option value="9">9月</option>
+                                    <option value="10">10月</option>
+                                    <option value="11">11月</option>
+                                    <option value="12">12月</option>
+                                </select>
+                            </div>
+
+                            <div id="list-loading" class="loading-text">データを取得しています...</div>
+
+                            <div id="withdraw-actions" style="margin-bottom:15px; display:none; background: rgba(255,230,230,0.5); padding: 10px; border-radius: 8px;">
+                                <button class="btn reject" id="btn-bulk-withdraw" style="padding: 8px 15px; font-size: 0.95rem;">選択した経費を一括取り下げ（修正用リストへ戻す）</button>
+                            </div>
+
+                            <div class="history-table-wrapper" id="expense-table-wrapper" style="display:none;">
+                                <table class="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="45" style="text-align:center;"><input type="checkbox" id="check-all-withdraw" onclick="toggleAllWithdraw()"><br><span style="font-size:0.65rem;font-weight:normal;">全選択</span></th>
+                                            <th>利用日</th>
+                                            <th>経費科目</th>
+                                            <th>金額</th>
+                                            <th>店名/会社名</th>
+                                            <th>ステータス</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expense-tbody">
+                                        <!-- JS動的生成 -->
+                                    </tbody>
+                                </table>
+                                <div style="text-align: right; margin-top: 10px; font-weight: bold; padding-right: 10px;">
+                                    精算対象合計金額: <span id="expense-total-amount">¥ 0</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- ============================== -->
+                <!--  タブ3: 承認画面（上席・総務長）      -->
+                <!-- ============================== -->
+                <div id="tab-approve" class="tab-content" style="display:none;">
+                    <div style="max-width: 1200px; margin: 0 auto;">
+                        <section class="card glass">
+                            <h2>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
+                                    stroke-linejoin="miter">
+                                    <polyline points="9 11 12 14 22 4"></polyline>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                </svg>
+                                <span id="approve-title">承認待ち経費</span>
+                            </h2>
+
+                            <div id="approve-loading" class="loading-text">データを取得しています...</div>
+
+                            <div id="approve-container" style="display:none; margin-top: 20px;">
+                                <!-- JSで申請者ごとのブロックを動的生成 -->
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- ============================== -->
+                <!--  タブ4: 承認済み画面（Admin専用） -->
+                <!-- ============================== -->
+                <div id="tab-completed" class="tab-content" style="display:none;">
+                    <div style="max-width: 1200px; margin: 0 auto;">
+                        <section class="card glass">
+                            <h2>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"
+                                    stroke-linejoin="miter">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                承認済み経費
+                            </h2>
+
+                            <div id="completed-loading" class="loading-text">データを取得しています...</div>
+
+                            <div class="history-table-wrapper" id="completed-table-wrapper" style="display:none; margin-top:20px;">
+                                <table class="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>申請者</th>
+                                            <th>利用日</th>
+                                            <th>経費科目</th>
+                                            <th>金額</th>
+                                            <th>承認者</th>
+                                            <th>承認日時</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="completed-tbody">
+                                        <!-- JS動的生成 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- 棄却理由モーダル -->
+        <div class="modal-overlay" id="reject-modal" style="display:none;">
+            <div class="modal-content card glass">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    棄却理由
+                </h2>
+                <div class="form-group">
+                    <label for="reject-reason">棄却理由を入力してください <span class="required">*</span></label>
+                    <textarea id="reject-reason" rows="4" placeholder="棄却理由を記入"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" id="btn-reject-cancel">キャンセル</button>
+                    <button type="button" class="btn submit-btn" id="btn-reject-confirm"
+                        style="margin-top:0;">棄却する</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 詳細表示モーダル -->
+        <div class="modal-overlay" id="detail-modal" style="display:none;">
+            <div class="modal-content card glass modal-wide">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    経費詳細
+                </h2>
+                <div id="detail-body"></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" id="btn-detail-close">閉じる</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- トースト通知 -->
+        <div class="toast-container" id="toast-container"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
