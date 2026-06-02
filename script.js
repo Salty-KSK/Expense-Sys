@@ -906,7 +906,7 @@ JSONのみを返してください。説明文は不要です。`
                 localStorage.setItem('demoExpenses', JSON.stringify(all));
                 updateDraftUI();
                 await loadExpenseList();
-                document.querySelector('.tab-btn[data-tab="tab-input"]').click();
+                document.querySelector('.tab-btn[data-tab="tab-new"]').click();
                 btnBulkWithdraw.disabled = false;
                 showToast(`${checkboxes.length}件を修正リストに戻しました`, 'success');
                 return;
@@ -943,7 +943,7 @@ JSONのみを返してください。説明文は不要です。`
                 const checkAll = document.getElementById('check-all-withdraw');
                 if (checkAll) checkAll.checked = false;
                 
-                document.querySelector('.tab-btn[data-tab="tab-input"]').click();
+                document.querySelector('.tab-btn[data-tab="tab-new"]').click();
                 window.scrollTo(0, 0); 
                 
                 showToast(`${checkboxes.length}件の経費を取り下げ、修正画面へ戻しました`, 'success');
