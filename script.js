@@ -218,19 +218,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     // ============================================
-    // 従業員マスタ取得 & ログイン
+    // 従業員マスタ取得 & ログイン（キャッシュ付き高速化）
     // ============================================
-    async function loadEmployees() {
-        if (GAS_WEBAPP_URL.includes('YOUR_GAS')) {
-            // デモモード：ダミーデータ
-            const demoEmployees = [
-                { name: '塩野谷圭介', email: 'shionoya@example.com', department: '工事課', role: 'employee', supervisor: '山田太郎', empId: '1001' },
-                { name: '山田太郎', email: 'yamada@example.com', department: '工事課', role: 'manager', supervisor: '', empId: '1002' },
-                { name: '佐藤花子', email: 'sato@example.com', department: '総務課', role: 'admin', supervisor: '', empId: '1003' },
-            ];
-            return demoEmployees;
-        }
+    const EMPLOYEE_CACHE_KEY = 'cachedEmployees';
+    const EMPLOYEE_CACHE_TS_KEY = 'cachedEmployeesTimestamp';
+    const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24時間
 
+    function getCachedEmployees() {
+        try {
+            const cached = localStorage.getItem(EMPLOYEE_CACHE_KEY);
+            const ts = localStorage.getItem(EMPLOYEE_CACHE_TS_KEY);
+            if (cached && ts) {
+                const age = Date.now() - parseInt(ts);
+                if (age < CACHE_MAX_AGE_MS) {
+                    return JSON.parse(cached);
+                }
+            }
+        } catch (e) { /* ignore */ }
+        return null;
+    }
+
+    function setCachedEmployees(employees) {
+        try {
+            localStorage.setItem(EMPLOYEE_CACHE_KEY, JSON.stringify(employees));
+            localStorage.setItem(EMPLOYEE_CACHE_TS_KEY, String(Date.now()));
+        } catch (e) { /* ignore */ }
+    }
+
+    async function fetchEmployeesFromGAS() {
         try {
             const res = await fetch(`${GAS_WEBAPP_URL}?mode=get_employees`);
             if (!res.ok) throw new Error('Failed to fetch employees');
@@ -248,10 +263,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         return [];
     }
 
-    loadEmployees().then(employees => {
-        window.globalEmployees = employees; // グローバルに保持
+    async function loadEmployees() {
+        if (GAS_WEBAPP_URL.includes('YOUR_GAS')) {
+            const demoEmployees = [
+                { name: '塩野谷圭介', email: 'shionoya@example.com', department: '工事課', role: 'employee', supervisor: '山田太郎', empId: '1001' },
+                { name: '山田太郎', email: 'yamada@example.com', department: '工事課', role: 'manager', supervisor: '', empId: '1002' },
+                { name: '佐藤花子', email: 'sato@example.com', department: '総務課', role: 'admin', supervisor: '', empId: '1003' },
+            ];
+            return demoEmployees;
+        }
+
+        // キャッシュがあれば即座に返し、バックグラウンドで最新を取得
+        const cached = getCachedEmployees();
+        if (cached && cached.length > 0) {
+            // バックグラウンドで最新データを取得・キャッシュ更新
+            fetchEmployeesFromGAS().then(fresh => {
+                if (fresh && fresh.length > 0) {
+                    setCachedEmployees(fresh);
+                    window.globalEmployees = fresh;
+                }
+            });
+            return cached;
+        }
+
+        // キャッシュがない場合はGASから取得して待つ
+        const employees = await fetchEmployeesFromGAS();
+        if (employees && employees.length > 0) {
+            setCachedEmployees(employees);
+        }
+        return employees;
+    }
+
+    function applyEmployees(employees) {
+        window.globalEmployees = employees;
         
         if (submissionTarget) {
+            // 既存のoptionをクリア（デフォルトの「選択してください」以外）
+            while (submissionTarget.options.length > 1) {
+                submissionTarget.remove(1);
+            }
             employees.forEach(emp => {
                 if (emp.position === '課長' || emp.role === 'manager') {
                     const opt = document.createElement('option');
@@ -262,7 +312,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         
-        window.employeesLoaded = true; // ロード完了フラグ
+        window.employeesLoaded = true;
+    }
+
+    loadEmployees().then(employees => {
+        applyEmployees(employees);
     });
 
     // 自動ログインチェック
